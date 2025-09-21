@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIFT Browser Extension Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .wireframe-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            max-width: 1400px;
+            width: 100%;
+            min-height: 900px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+
+        .wireframe-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .wireframe-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .wireframe-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .main-content {
+            display: flex;
+            height: calc(100% - 80px);
+            min-height: 820px;
+        }
+
+        /* Left Side - Webpage Mockup */
+        .webpage-section {
+            flex: 2;
+            background: #ffffff;
+            border-right: 2px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .browser-chrome {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .browser-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .browser-button {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28ca42; }
+
+        .address-bar {
+            flex: 1;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-left: 16px;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .webpage-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .article-header {
+            margin-bottom: 24px;
+        }
+
+        .article-title {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.2;
+            margin-bottom: 12px;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 20px;
+        }
+
+        .author {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .timestamp {
+            font-weight: 400;
+        }
+
+        .article-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #e5e7eb 0%, #f3f4f6 100%);
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+        }
+
+        .article-content {
+            line-height: 1.7;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .article-paragraph {
+            margin-bottom: 16px;
+        }
+
+        .highlighted-text {
+            background: linear-gradient(120deg, #fef3c7 0%, #fbbf24 100%);
+            padding: 2px 4px;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+            animation: pulse-highlight 2s infinite;
+        }
+
+        @keyframes pulse-highlight {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(251, 191, 36, 0.1); }
+        }
+
+        .sift-indicator {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #3b82f6;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        /* Right Side - SIFT Sidebar */
+        .sift-sidebar {
+            flex: 1;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            max-width: 420px;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .sift-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-tagline {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 0;
+            overflow-y: auto;
+        }
+
+        /* Chat Interface */
+        .chat-section {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .ai-message {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .ai-avatar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .avatar-icon {
+            width: 24px;
+            height: 24px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .ai-name {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .ai-message-text {
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .action-button.secondary {
+            background: #6b7280;
+        }
+
+        .action-button.secondary:hover {
+            background: #4b5563;
+        }
+
+        /* Analysis Modules */
+        .analysis-modules {
+            padding: 0;
+        }
+
+        .module {
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .module-header {
+            padding: 16px 20px;
+            background: #f8fafc;
+            border: none;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            transition: all 0.2s ease;
+        }
+
+        .module-header:hover {
+            background: #f1f5f9;
+        }
+
+        .module-header.expanded {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .module-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .module-icon {
+            font-size: 1rem;
+        }
+
+        .module-status {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .status-warning {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-info {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .chevron {
+            transition: transform 0.2s ease;
+        }
+
+        .chevron.expanded {
+            transform: rotate(180deg);
+        }
+
+        .module-content {
+            padding: 16px 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            display: none;
+        }
+
+        .module-content.expanded {
+            display: block;
+        }
+
+        .finding {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .finding:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .finding-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .finding-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .value-high { color: #dc2626; }
+        .value-medium { color: #d97706; }
+        .value-low { color: #059669; }
+
+        .confidence-bar {
+            width: 100%;
+            height: 8px;
+            background: #f3f4f6;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            width: 75%;
+            border-radius: 4px;
+        }
+
+        .confidence-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .webpage-section {
+                flex: none;
+                height: 50vh;
+            }
+            
+            .sift-sidebar {
+                flex: none;
+                max-width: none;
+                height: 50vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .wireframe-container {
+                margin: 10px;
+                min-height: auto;
+            }
+            
+            .webpage-content {
+                padding: 20px;
+            }
+            
+            .article-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wireframe-container">
+        <div class="wireframe-header">
+            <h1 class="wireframe-title">SIFT Browser Extension Interface</h1>
+            <p class="wireframe-subtitle">Real-time Misinformation Detection & Educational Guidance</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Left Side - Webpage Mockup -->
+            <div class="webpage-section">
+                <div class="browser-chrome">
+                    <div class="browser-buttons">
+                        <div class="browser-button close"></div>
+                        <div class="browser-button minimize"></div>
+                        <div class="browser-button maximize"></div>
+                    </div>
+                    <div class="address-bar">https://example-news-site.com/article/breakthrough-ai-discovery</div>
+                </div>
+
+                <div class="webpage-content">
+                    <div class="article-header">
+                        <h1 class="article-title">Revolutionary AI Breakthrough Could Transform Healthcare</h1>
+                        <div class="article-meta">
+                            <span class="author">Dr. Sarah Johnson</span>
+                            <span class="timestamp">Published 2 hours ago</span>
+                            <span style="color: #059669; font-weight: 600;">• Breaking News</span>
+                        </div>
+                    </div>
+
+                    <div class="article-image">
+                        [Hero Image: AI Healthcare Technology]
+                    </div>
+
+                    <div class="article-content">
+                        <p class="article-paragraph">
+                            Scientists at the prestigious MedTech Research Institute announced today a groundbreaking AI system that can diagnose diseases with unprecedented accuracy.
+                        </p>
+                        
+                        <p class="article-paragraph">
+                            <span class="highlighted-text">
+                                The new system achieves 99.9% accuracy in cancer detection, significantly outperforming human doctors
+                                <span class="sift-indicator">SIFT</span>
+                            </span>, according to the research team led by Dr. Michael Chen.
+                        </p>
+                        
+                        <p class="article-paragraph">
+                            The technology uses advanced neural networks trained on over 10 million medical images, representing the largest dataset ever assembled for medical AI research. Clinical trials are expected to begin next month at major hospitals across the country.
+                        </p>
+                        
+                        <p class="article-paragraph">
+                            "This could revolutionize how we approach early disease detection," said Dr. Chen in an exclusive interview. "The implications for global healthcare are immense."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side - SIFT Sidebar -->
+            <div class="sift-sidebar">
+                <div class="sidebar-header">
+                    <div class="sift-logo">
+                        <div class="logo-icon">🔍</div>
+                        <div class="logo-text">SIFT</div>
+                    </div>
+                    <div class="sidebar-tagline">AI Digital Literacy Coach</div>
+                </div>
+
+                <div class="sidebar-content">
+                    <!-- Chat Interface -->
+                    <div class="chat-section">
+                        <div class="ai-message">
+                            <div class="ai-avatar">
+                                <div class="avatar-icon">S</div>
+                                <div class="ai-name">SIFT AI Coach</div>
+                            </div>
+                            <div class="ai-message-text">
+                                "I noticed you're reading about a medical AI breakthrough. Let's investigate this claim together. Where should we start?"
+                            </div>
+                            <div class="quick-actions">
+                                <button class="action-button">Check Source</button>
+                                <button class="action-button secondary">Analyze Claims</button>
+                                <button class="action-button secondary">Find Similar</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analysis Modules -->
+                    <div class="analysis-modules">
+                        <!-- Source Analysis Module -->
+                        <div class="module">
+                            <button class="module-header expanded" onclick="toggleModule(this)">
+                                <div class="module-title">
+                                    <span class="module-icon">🏛️</span>
+                                    <span>Source Analysis</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="module-status status-warning">Medium Risk</span>
+                                    <span class="chevron expanded">▼</span>
+                                </div>
+                            </button>
+                            <div class="module-content expanded">
+                                <div class="finding">
+                                    <span class="finding-label">Domain Age</span>
+                                    <span class="finding-value value-high">3 months</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">SSL Certificate</span>
+                                    <span class="finding-value value-low">Valid</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Author Credentials</span>
+                                    <span class="finding-value value-medium">Unverified</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Editorial Standards</span>
+                                    <span class="finding-value value-medium">Unknown</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Linguistic Analysis Module -->
+                        <div class="module">
+                            <button class="module-header" onclick="toggleModule(this)">
+                                <div class="module-title">
+                                    <span class="module-icon">📝</span>
+                                    <span>Linguistic Analysis</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="module-status status-warning">High Emotion</span>
+                                    <span class="chevron">▼</span>
+                                </div>
+                            </button>
+                            <div class="module-content">
+                                <div class="finding">
+                                    <span class="finding-label">Emotional Language</span>
+                                    <span class="finding-value value-high">High (87%)</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Superlatives</span>
+                                    <span class="finding-value value-high">Excessive</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Certainty Markers</span>
+                                    <span class="finding-value value-medium">Moderate</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Technical Terms</span>
+                                    <span class="finding-value value-low">Appropriate</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Claim Triangulation Module -->
+                        <div class="module">
+                            <button class="module-header" onclick="toggleModule(this)">
+                                <div class="module-title">
+                                    <span class="module-icon">🔍</span>
+                                    <span>Claim Triangulation</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="module-status status-info">2 Sources Found</span>
+                                    <span class="chevron">▼</span>
+                                </div>
+                            </button>
+                            <div class="module-content">
+                                <div class="finding">
+                                    <span class="finding-label">Similar Claims</span>
+                                    <span class="finding-value value-medium">2 found</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Fact-check Results</span>
+                                    <span class="finding-value value-medium">Mixed</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Expert Consensus</span>
+                                    <span class="finding-value value-high">No consensus</span>
+                                </div>
+                                <div class="finding">
+                                    <span class="finding-label">Publication Pattern</span>
+                                    <span class="finding-value value-medium">Suspicious timing</span>
+                                </div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill"></div>
+                                </div>
+                                <div class="confidence-label">Overall Confidence: 75%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleModule(header) {
+            const module = header.parentElement;
+            const content = module.querySelector('.module-content');
+            const chevron = header.querySelector('.chevron');
+            
+            const isExpanded = header.classList.contains('expanded');
+            
+            if (isExpanded) {
+                header.classList.remove('expanded');
+                content.classList.remove('expanded');
+                chevron.classList.remove('expanded');
+            } else {
+                header.classList.add('expanded');
+                content.classList.add('expanded');
+                chevron.classList.add('expanded');
+            }
+        }
+
+        // Simulate real-time analysis updates
+        setTimeout(() => {
+            const statusElements = document.querySelectorAll('.module-status');
+            statusElements[1].textContent = 'Analysis Complete';
+            statusElements[1].className = 'module-status status-success';
+        }, 3000);
+
+        setTimeout(() => {
+            const statusElements = document.querySelectorAll('.module-status');
+            statusElements[2].textContent = '3 Sources Found';
+            statusElements[2].className = 'module-status status-success';
+        }, 5000);
+    </script>
+</body>
+</html>
