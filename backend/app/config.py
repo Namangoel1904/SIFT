@@ -69,17 +69,26 @@ class Settings(BaseSettings):
         For production, set CORS_ORIGINS environment variable with comma-separated URLs.
         Example: CORS_ORIGINS=https://your-app.netlify.app,https://another-domain.com
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        
         origins = self._DEFAULT_CORS_ORIGINS.copy()
         
         # Parse environment variable (comma-separated string)
         env_origins = os.getenv("CORS_ORIGINS") or self.CORS_ORIGINS
-        if env_origins:
-            origins.extend([origin.strip() for origin in env_origins.split(",") if origin.strip()])
+        logger.info(f"Raw CORS_ORIGINS env var: {repr(env_origins)}")
         
-        # Allow all origins in development if explicitly set
+        if env_origins:
+            parsed_origins = [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+            origins.extend(parsed_origins)
+            logger.info(f"Parsed additional CORS origins: {parsed_origins}")
+        
+        # Allow all origins if explicitly set (for quick testing)
         if os.getenv("ALLOW_ALL_ORIGINS", "").lower() == "true":
+            logger.warning("ALLOW_ALL_ORIGINS is set to true - allowing all origins")
             return ["*"]
         
+        logger.info(f"Final CORS origins list: {origins}")
         return origins
     
     class Config:
