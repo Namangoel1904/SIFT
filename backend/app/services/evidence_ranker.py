@@ -24,7 +24,7 @@ class EvidenceRanker:
         if source_type == "fact_check_api":
             return self.PRIORITY_FACT_CHECK_API
         
-        # Check for fact-check domains
+        # Check for fact-check domains (including Indian fact-checking sources)
         factcheck_domains = [
             "factcheck.org",
             "snopes.com",
@@ -36,7 +36,15 @@ class EvidenceRanker:
             "leadstories.com",
             "factcheck",
             "snopes",
-            "politifact"
+            "politifact",
+            # Indian fact-checking whitelist
+            "altnews.in",
+            "boomlive.in",
+            "factly.in",
+            "pib.gov.in",
+            "indiatoday.in/fact-check",
+            "thequint.com/fact-check",
+            "factcrescendo.com"
         ]
         if any(domain in url_lower for domain in factcheck_domains):
             return self.PRIORITY_FACT_CHECK_API

@@ -19,16 +19,17 @@ function ClaimResultCard({ claim }) {
     return 'text-red-600 stroke-red-600';
   };
 
-  const getFinalVerdictLabel = (verdict) => {
-    const labels = {
-      'TRUE': '✅ TRUE',
-      'LIKELY_TRUE': '✅ LIKELY TRUE',
-      'UNCERTAIN': '⚠️ UNCERTAIN',
-      'MIXED': '⚠️ MIXED',
-      'LIKELY_FALSE': '❌ LIKELY FALSE',
-      'FALSE': '❌ FALSE'
-    };
-    return labels[verdict] || verdict;
+  const getFinalVerdictLabel = (score, verdict) => {
+    // Dynamic badge text based on score ranges (UI only)
+    if (score >= 75) {
+      return '✅ Likely True';
+    } else if (score >= 50) {
+      return '🟡 Mixed / Partially True';
+    } else if (score >= 25) {
+      return '🔶 Likely Misleading';
+    } else {
+      return '❌ False / Unsupported';
+    }
   };
 
   const getVerdictChip = (verdict) => {
@@ -130,9 +131,9 @@ function ClaimResultCard({ claim }) {
             </div>
           </div>
         </div>
-        {/* Verdict label */}
+        {/* Verdict label - dynamic based on score */}
         <div className={`mt-2 text-sm font-semibold ${colorClass.replace('stroke-', 'text-')} text-center`}>
-          {getFinalVerdictLabel(verdict)}
+          {getFinalVerdictLabel(score, verdict)}
         </div>
       </div>
     );
@@ -149,7 +150,27 @@ function ClaimResultCard({ claim }) {
           <div className="mb-4 pb-4 border-b border-gray-200">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="text-xs font-semibold text-gray-600 mb-2">AI-Verified Final Score</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-xs font-semibold text-gray-600">AI-Verified Final Score</h3>
+                  {/* Tooltip icon */}
+                  <div className="group relative">
+                    <svg 
+                      className="w-4 h-4 text-gray-400 hover:text-gray-600 cursor-help" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {/* Tooltip */}
+                    <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                      Overall truth scoring may differ from sub-claim ratings if some details are misleading or uncertain.
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1">
+                        <div className="w-2 h-2 bg-gray-800 transform rotate-45"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div className="flex items-center gap-4">
                   <CircularProgress score={finalScore} verdict={finalVerdict} />
                   <div className="flex-1">
@@ -172,6 +193,10 @@ function ClaimResultCard({ claim }) {
         <div className="mb-3">
           <p className="text-sm font-medium text-gray-800 leading-relaxed">
             {claim.claim}
+          </p>
+          {/* Helper text for sub-claim analysis */}
+          <p className="text-xs text-gray-500 italic mt-1">
+            Sub-claim analysis — may not reflect entire statement.
           </p>
           {claim.claim_translated && claim.original_claim && claim.original_claim !== claim.claim && (
             <div className="mt-2 text-xs text-gray-500 italic">

@@ -2,6 +2,18 @@
 
 A full-stack browser extension that uses AI to detect and fact-check misinformation in online content.
 
+🎯 Brand: SIFT — Source • Investigate • Find • Trace
+
+Primary Color:  #0055FF  (Royal Verification Blue)
+Secondary:      #FFFFFF  (Clean Neutral White)
+Accent:         #2ECC71  (Credibility Green)
+Text Color:     #1A1A1A  (Readable Deep Charcoal)
+Warning Color:  #FF9800  (Misleading Indicator)
+False Color:    #D32F2F  (False Claim Marker)
+Border Radius:  12px
+Font:           Inter / Roboto (Headings bold)
+Layout:         Right-side Panel / Full-height
+
 ## Features
 
 - 🔍 **Real-time Fact-Checking**: Select text on any webpage and get instant fact-check results

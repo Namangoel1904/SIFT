@@ -224,17 +224,22 @@ function App() {
                 )}
 
                 {/* Summary */}
-                {results.summary && (
+                {results.summary && results.claims && results.claims.length > 0 && (
                   <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
                     <h2 className="text-lg font-semibold text-gray-800 mb-2">Summary</h2>
-                    <p className="text-sm text-gray-700">{results.summary}</p>
+                    <p className="text-sm text-gray-700">
+                      Total claims evaluated: {results.claims.length}. AI uses combined evidence across all claims to determine the overall rating.
+                    </p>
                   </div>
                 )}
 
                 {/* Claims Results */}
                 {results.claims && results.claims.length > 0 ? (
                   <div className="space-y-4">
-                    <h2 className="text-lg font-semibold text-gray-800">Fact-Check Results</h2>
+                    {/* Visual separator before claim-level evidence */}
+                    <div className="border-t border-gray-300 pt-4">
+                      <h2 className="text-lg font-semibold text-gray-800 mb-4">Claim-Level Evidence</h2>
+                    </div>
                     {results.claims.map((claim, index) => (
                       <ClaimResultCard key={index} claim={claim} />
                     ))}

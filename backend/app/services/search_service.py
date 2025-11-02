@@ -11,6 +11,17 @@ logger = logging.getLogger(__name__)
 class SearchService:
     """Service for web search using multiple APIs."""
     
+    # Whitelist of trusted Indian fact-checking domains
+    INDIAN_FACTCHECK_WHITELIST = [
+        "altnews.in",
+        "boomlive.in",
+        "factly.in",
+        "pib.gov.in",
+        "indiatoday.in/fact-check",
+        "thequint.com/fact-check",
+        "factcrescendo.com"
+    ]
+    
     def __init__(self):
         """Initialize search service."""
         self.fact_check_api_key = settings.FACT_CHECK_API_KEY
@@ -116,14 +127,18 @@ class SearchService:
                                     if review_urls:
                                         url = review_urls[0]
                                     
-                                    results.append({
-                                        "title": claim.get("text", "")[:100] or "Fact Check",
-                                        "url": url,
-                                        "snippet": " ".join(review_texts[:2])[:300] if review_texts else claim.get("text", "")[:300],
-                                        "source": "fact_check_api",
-                                        "claim_original": claim.get("text", ""),
-                                        "fact_check_reviews": review_urls
-                                    })
+                                results.append({
+                                    "title": claim.get("text", "")[:100] or "Fact Check",
+                                    "url": url,
+                                    "link": url,  # Add 'link' key for consistency with prioritize_whitelisted_sources
+                                    "snippet": " ".join(review_texts[:2])[:300] if review_texts else claim.get("text", "")[:300],
+                                    "source": "fact_check_api",
+                                    "claim_original": claim.get("text", ""),
+                                    "fact_check_reviews": review_urls
+                                })
+                                
+                                # Prioritize whitelisted sources
+                                results = self.prioritize_whitelisted_sources(results)
                                 
                                 return results
                             else:
@@ -203,10 +218,34 @@ class SearchService:
                         "source": "google_custom_search"
                     })
                 
+                # Prioritize whitelisted sources
+                results = self.prioritize_whitelisted_sources(results)
+                
                 return results
         except Exception as e:
             print(f"Google Custom Search error: {e}")
             return []
+    
+    def prioritize_whitelisted_sources(self, results: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Prioritize results from whitelisted Indian fact-checking domains.
+        
+        Args:
+            results: List of search results with 'link' or 'url' keys
+            
+        Returns:
+            Sorted list with whitelisted sources first
+        """
+        def is_whitelisted(result: Dict[str, Any]) -> bool:
+            """Check if result URL matches whitelist."""
+            url = result.get('link') or result.get('url', '').lower()
+            return any(domain in url for domain in self.INDIAN_FACTCHECK_WHITELIST)
+        
+        # Separate whitelisted and non-whitelisted results
+        whitelisted = [r for r in results if is_whitelisted(r)]
+        others = [r for r in results if not is_whitelisted(r)]
+        
+        # Return whitelisted first, then others
+        return whitelisted + others
     
     async def search(self, query: str, num_results: int = 10) -> List[Dict[str, Any]]:
         """Search using all available APIs."""
@@ -220,7 +259,18 @@ class SearchService:
         google_results = await self.search_google_custom(query, num_results - len(all_results))
         all_results.extend(google_results)
         
-        return all_results[:num_results]
+        # Prioritize whitelisted sources in final results
+        all_results = self.prioritize_whitelisted_sources(all_results)
+        
+        # Ensure whitelisted sources appear in top 3 if available
+        whitelisted_all = [r for r in all_results 
+                          if any(domain in (r.get('link') or r.get('url', '').lower()) 
+                                for domain in self.INDIAN_FACTCHECK_WHITELIST)]
+        others_all = [r for r in all_results if r not in whitelisted_all]
+        
+        # Build final list: whitelisted first (max 3), then others
+        final_results = whitelisted_all[:3] + others_all
+        return final_results[:num_results]
     
     def is_factcheck_source(self, url: str) -> bool:
         """Check if URL is from a known fact-checking source."""
@@ -235,8 +285,16 @@ class SearchService:
             "leadstories.com"
         ]
         
+        # Include Indian fact-checking whitelist
+        factcheck_domains.extend(self.INDIAN_FACTCHECK_WHITELIST)
+        
         url_lower = url.lower()
         return any(domain in url_lower for domain in factcheck_domains)
+    
+    def is_whitelisted_source(self, url: str) -> bool:
+        """Check if URL is from the Indian fact-checking whitelist."""
+        url_lower = url.lower()
+        return any(domain in url_lower for domain in self.INDIAN_FACTCHECK_WHITELIST)
     
     async def search_factcheck_sources(self, query: str) -> List[Dict[str, Any]]:
         """Search specifically in fact-checking sources."""
