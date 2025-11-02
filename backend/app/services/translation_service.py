@@ -1,7 +1,10 @@
 """Service for translation using Google Cloud Translation API."""
 from google.cloud import translate_v2 as translate
+from google.oauth2 import service_account
 import logging
 import hashlib
+import json
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -14,11 +17,31 @@ class TranslationService:
     """Service for translating text to English using Google Cloud Translation API."""
     
     def __init__(self):
-        """Initialize translation service."""
+        """Initialize translation service.
+        
+        Supports both file-based credentials (GOOGLE_APPLICATION_CREDENTIALS)
+        and JSON string credentials (GOOGLE_CREDENTIALS_JSON) for Render deployment.
+        """
         try:
-            self.client = translate.Client()
-            self.enabled = True
-            logger.info("Translation Service initialized successfully with Google Cloud Translation API")
+            # Try to initialize credentials from JSON string first (Render-compatible)
+            credentials_json = os.getenv("GOOGLE_CREDENTIALS_JSON")
+            if credentials_json:
+                try:
+                    credentials_dict = json.loads(credentials_json)
+                    credentials = service_account.Credentials.from_service_account_info(
+                        credentials_dict
+                    )
+                    self.client = translate.Client(credentials=credentials)
+                    self.enabled = True
+                    logger.info("Translation Service initialized with JSON credentials (Render-compatible)")
+                except (json.JSONDecodeError, ValueError) as e:
+                    logger.error(f"Failed to parse GOOGLE_CREDENTIALS_JSON: {e}")
+                    raise
+            else:
+                # Fallback to file-based credentials (local development)
+                self.client = translate.Client()
+                self.enabled = True
+                logger.info("Translation Service initialized with file-based credentials")
         except Exception as e:
             logger.error(f"Translation Service init error: {e}")
             logger.warning("Translation will fallback to original text if translation is unavailable")

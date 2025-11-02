@@ -30,7 +30,10 @@ class Settings(BaseSettings):
     FACT_CHECK_API_KEY: Optional[str] = os.getenv("FACT_CHECK_API_KEY")
 
     # Google Cloud Credentials
+    # For local development: path to credentials file
     GOOGLE_APPLICATION_CREDENTIALS: Optional[str] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    # For Render deployment: JSON string from environment variable
+    GOOGLE_CREDENTIALS_JSON: Optional[str] = os.getenv("GOOGLE_CREDENTIALS_JSON")
     
     # Cache Settings
     CACHE_TTL: int = int(os.getenv("CACHE_TTL", "3600"))
@@ -44,11 +47,34 @@ class Settings(BaseSettings):
     FACTCHECK_PROVIDERS: list = ["factcheck.org", "snopes", "politifact"]
     
     # CORS Settings
+    # Note: FastAPI CORS doesn't support wildcards, so use specific origins or ["*"] for all
     CORS_ORIGINS: list = [
-        "chrome-extension://*",
-        "http://localhost:*",
-        "http://127.0.0.1:*"
+        "http://localhost",
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
     ]
+    
+    # Additional CORS origins from environment (comma-separated)
+    @property
+    def cors_origins(self) -> list:
+        """Get CORS origins including environment-based additions.
+        
+        For production, set CORS_ORIGINS environment variable with comma-separated URLs.
+        Example: CORS_ORIGINS=https://your-app.netlify.app,https://another-domain.com
+        """
+        origins = self.CORS_ORIGINS.copy()
+        env_origins = os.getenv("CORS_ORIGINS", "")
+        if env_origins:
+            origins.extend([origin.strip() for origin in env_origins.split(",") if origin.strip()])
+        
+        # Allow all origins in development if explicitly set
+        if os.getenv("ALLOW_ALL_ORIGINS", "").lower() == "true":
+            return ["*"]
+        
+        return origins
     
     class Config:
         env_file = ".env"
