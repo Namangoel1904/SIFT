@@ -48,7 +48,8 @@ class Settings(BaseSettings):
     
     # CORS Settings
     # Note: FastAPI CORS doesn't support wildcards, so use specific origins or ["*"] for all
-    CORS_ORIGINS: list = [
+    # Default CORS origins for local development
+    _DEFAULT_CORS_ORIGINS = [
         "http://localhost",
         "http://localhost:3000",
         "http://localhost:5173",
@@ -57,7 +58,10 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
     ]
     
-    # Additional CORS origins from environment (comma-separated)
+    # CORS_ORIGINS from environment variable (comma-separated string)
+    # Don't define as list type to avoid Pydantic JSON parsing issues
+    CORS_ORIGINS: Optional[str] = None
+    
     @property
     def cors_origins(self) -> list:
         """Get CORS origins including environment-based additions.
@@ -65,8 +69,10 @@ class Settings(BaseSettings):
         For production, set CORS_ORIGINS environment variable with comma-separated URLs.
         Example: CORS_ORIGINS=https://your-app.netlify.app,https://another-domain.com
         """
-        origins = self.CORS_ORIGINS.copy()
-        env_origins = os.getenv("CORS_ORIGINS", "")
+        origins = self._DEFAULT_CORS_ORIGINS.copy()
+        
+        # Parse environment variable (comma-separated string)
+        env_origins = os.getenv("CORS_ORIGINS") or self.CORS_ORIGINS
         if env_origins:
             origins.extend([origin.strip() for origin in env_origins.split(",") if origin.strip()])
         
