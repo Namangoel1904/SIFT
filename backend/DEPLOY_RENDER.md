@@ -20,11 +20,27 @@ Before deploying, gather all required credentials:
 - Google Cloud Translation Service Account JSON
 
 **Getting Translation Credentials:**
-1. Go to Google Cloud Console
-2. Navigate to IAM & Admin → Service Accounts
-3. Create or select a service account
-4. Download JSON key file
-5. Copy entire JSON content for `GOOGLE_CREDENTIALS_JSON` env var
+
+**See detailed guide:** `GOOGLE_CREDENTIALS_SETUP.md`
+
+**Quick steps:**
+1. Go to Google Cloud Console → IAM & Admin → Service Accounts
+2. Create a service account with **Cloud Translation API User** role
+3. Download the JSON key file
+4. Open the JSON file and **copy the ENTIRE contents** (everything from `{` to `}`)
+5. Paste the entire JSON as the value for `GOOGLE_CREDENTIALS_JSON` in Render
+
+**Example JSON structure (you'll have the actual values):**
+```json
+{
+  "type": "service_account",
+  "project_id": "your-project-id",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n",
+  "client_email": "service@project.iam.gserviceaccount.com",
+  ...
+}
+```
+**Just copy everything inside the file and paste it as the value!**
 
 ### 2. Connect Repository to Render
 
@@ -56,7 +72,10 @@ GOOGLE_API_KEY=your_gemini_api_key_here
 GOOGLE_SEARCH_API_KEY=your_search_api_key_here
 GOOGLE_SEARCH_CX=your_custom_search_engine_id
 FACT_CHECK_API_KEY=your_fact_check_api_key
-GOOGLE_CREDENTIALS_JSON={"type":"service_account","project_id":"...","private_key_id":"...","private_key":"-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n","client_email":"...","client_id":"...","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_x509_cert_url":"..."}
+GOOGLE_CREDENTIALS_JSON=<paste entire JSON file contents here>
+```
+**Important:** Open your downloaded JSON file, copy EVERYTHING (all lines), and paste it as the value.
+**Example:** `{"type":"service_account","project_id":"my-project","private_key":"-----BEGIN...","client_email":"service@project.iam.gserviceaccount.com",...}`
 ```
 
 **Important for GOOGLE_CREDENTIALS_JSON:**

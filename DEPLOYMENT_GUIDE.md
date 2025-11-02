@@ -56,14 +56,27 @@ This guide walks you through deploying both the frontend (Netlify) and backend (
    GOOGLE_SEARCH_API_KEY=your_key_here
    GOOGLE_SEARCH_CX=your_cx_here
    FACT_CHECK_API_KEY=your_key_here
-   GOOGLE_CREDENTIALS_JSON={"type":"service_account",...} (full JSON)
+   GOOGLE_CREDENTIALS_JSON=<paste entire JSON file contents here>
    CORS_ORIGINS=https://your-netlify-app.netlify.app
    ```
    
-   **Getting GOOGLE_CREDENTIALS_JSON:**
-   - Download service account JSON from Google Cloud Console
-   - Copy entire file content
-   - Paste into Render environment variable
+   **Getting GOOGLE_CREDENTIALS_JSON (IMPORTANT - Read carefully!):**
+   
+   1. Go to Google Cloud Console → IAM & Admin → Service Accounts
+   2. Create a service account with **Cloud Translation API User** role
+   3. Download the JSON key file (it downloads to your computer)
+   4. **Open that JSON file** in a text editor (Notepad, VS Code, etc.)
+   5. **Select ALL** (Ctrl+A) and **Copy** (Ctrl+C) - this copies the ENTIRE file
+   6. In Render, paste the entire copied content as the value for `GOOGLE_CREDENTIALS_JSON`
+   
+   **What it looks like:** Your JSON file contains something like:
+   ```json
+   {"type":"service_account","project_id":"my-project","private_key":"-----BEGIN PRIVATE KEY-----\n...","client_email":"service@project.iam.gserviceaccount.com",...}
+   ```
+   
+   **Just copy that ENTIRE string and paste it as the value!**
+   
+   📖 **Detailed step-by-step guide:** See `backend/GOOGLE_CREDENTIALS_SETUP.md`
 
 5. **Deploy**
    - Click "Create Web Service"

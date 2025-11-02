@@ -40,12 +40,22 @@ Go to **Environment** tab, add:
 | `GOOGLE_SEARCH_API_KEY` | Your key | Google Cloud Console |
 | `GOOGLE_SEARCH_CX` | Your CX ID | Google Custom Search |
 | `FACT_CHECK_API_KEY` | Your key | Google Fact Check Tools API |
-| `GOOGLE_CREDENTIALS_JSON` | Full JSON | Google Cloud Service Account |
+| `GOOGLE_CREDENTIALS_JSON` | **Full JSON file contents** | **See instructions below** |
 
 **For GOOGLE_CREDENTIALS_JSON:**
-- Download service account JSON from Google Cloud
-- Copy entire file content
-- Paste as environment variable value
+1. Go to Google Cloud Console → IAM & Admin → Service Accounts
+2. Create service account with **Cloud Translation API User** role
+3. Download JSON key file
+4. **Open the JSON file** → **Copy EVERYTHING** (all lines from `{` to `}`)
+5. **Paste the entire JSON** as the value in Render
+   
+   **Example:** If your JSON file contains:
+   ```json
+   {"type":"service_account","project_id":"my-project","private_key":"...","client_email":"..."}
+   ```
+   Just paste that entire string as the value!
+   
+   📖 **Detailed guide:** See `backend/GOOGLE_CREDENTIALS_SETUP.md`
 
 ### 1.4 Wait & Get URL
 - Wait 2-5 minutes for deployment

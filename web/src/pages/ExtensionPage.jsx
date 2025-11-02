@@ -2,9 +2,45 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function ExtensionPage() {
+  // Extension download URL - can be local file or external URL (Google Drive, etc.)
+  // For Google Drive: Get shareable link, then replace /view?usp=sharing with /uc?export=download
+  // Example: https://drive.google.com/uc?export=download&id=YOUR_FILE_ID
+  const EXTENSION_DOWNLOAD_URL = import.meta.env.VITE_EXTENSION_DOWNLOAD_URL || 
+    'https://drive.google.com/uc?export=download&id=YOUR_FILE_ID_HERE';
+  
   const handleDownload = () => {
-    // Trigger download of extension zip
-    window.location.href = '/sift-extension.zip';
+    // Check if URL is set and not the placeholder
+    if (EXTENSION_DOWNLOAD_URL.includes('YOUR_FILE_ID_HERE') || !EXTENSION_DOWNLOAD_URL) {
+      // Fallback to local file if env var not set
+      const link = document.createElement('a');
+      link.href = '/sift-extension.zip';
+      link.download = 'sift-extension.zip';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    
+    // For Google Drive links, use direct download method
+    if (EXTENSION_DOWNLOAD_URL.includes('drive.google.com')) {
+      // Create a form to trigger download (Google Drive requires this)
+      const form = document.createElement('form');
+      form.method = 'GET';
+      form.action = EXTENSION_DOWNLOAD_URL;
+      form.target = '_blank';
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    } else {
+      // For direct download links, create a temporary anchor and click it
+      const link = document.createElement('a');
+      link.href = EXTENSION_DOWNLOAD_URL;
+      link.download = 'sift-extension.zip';
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   return (
@@ -42,8 +78,11 @@ function ExtensionPage() {
           </p>
           <button
             onClick={handleDownload}
-            className="bg-primary text-white font-semibold px-8 py-4 rounded-brand hover:bg-blue-600 transition-colors text-lg"
+            className="bg-primary text-white font-semibold px-8 py-4 rounded-brand hover:bg-blue-600 transition-colors text-lg flex items-center gap-2 mx-auto"
           >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
             Download Extension
           </button>
         </div>
