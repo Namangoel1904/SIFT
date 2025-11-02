@@ -1,6 +1,12 @@
 // API Base URL - defaults to localhost for development
 // For production, set VITE_API_URL environment variable in Netlify
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const getApiBaseUrl = () => {
+  const url = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  // Remove trailing slash if present to avoid double slashes
+  return url.replace(/\/$/, '');
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function analyzeText(text) {
   const response = await fetch(`${API_BASE_URL}/api/v1/analyze`, {
