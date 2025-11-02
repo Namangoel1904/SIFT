@@ -79,7 +79,7 @@ class Settings(BaseSettings):
         logger.info(f"Raw CORS_ORIGINS env var: {repr(env_origins)}")
         
         if env_origins:
-            parsed_origins = [origin.strip() for origin in env_origins.split(",") if origin.strip()]
+            parsed_origins = [origin.strip().rstrip('/') for origin in env_origins.split(",") if origin.strip()]
             origins.extend(parsed_origins)
             logger.info(f"Parsed additional CORS origins: {parsed_origins}")
         

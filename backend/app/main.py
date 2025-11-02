@@ -18,12 +18,17 @@ cors_origins_list = settings.cors_origins
 logger.info(f"CORS origins configured: {cors_origins_list}")
 
 # Configure CORS
+# Remove trailing slashes from origins for consistent matching
+normalized_origins = [origin.rstrip('/') for origin in cors_origins_list]
+logger.info(f"Normalized CORS origins: {normalized_origins}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins_list,
+    allow_origins=normalized_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include routers
