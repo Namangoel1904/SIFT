@@ -21,16 +21,23 @@ function ExtensionPage() {
       return;
     }
     
-    // For Google Drive links, use direct download method
+    // For Google Drive links, handle the download properly
     if (EXTENSION_DOWNLOAD_URL.includes('drive.google.com')) {
-      // Create a form to trigger download (Google Drive requires this)
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.action = EXTENSION_DOWNLOAD_URL;
-      form.target = '_blank';
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
+      // Extract file ID from the URL
+      const urlParams = new URLSearchParams(EXTENSION_DOWNLOAD_URL.split('?')[1]);
+      const fileId = urlParams.get('id') || EXTENSION_DOWNLOAD_URL.match(/[\/=&]id=([a-zA-Z0-9_-]+)/)?.[1];
+      
+      if (fileId) {
+        // Method 1: Try direct download with confirmation (for large files)
+        // Google Drive requires confirm=t for files that trigger virus scan
+        const directDownloadUrl = `https://drive.google.com/uc?export=download&confirm=t&id=${fileId}`;
+        
+        // Open in new tab - this bypasses CORS and handles Google Drive's redirect
+        window.open(directDownloadUrl, '_blank');
+      } else {
+        // Fallback: open the provided URL directly
+        window.open(EXTENSION_DOWNLOAD_URL, '_blank');
+      }
     } else {
       // For direct download links, create a temporary anchor and click it
       const link = document.createElement('a');

@@ -18,10 +18,12 @@
 
 2. Extract the `FILE_ID` (the long string between `/d/` and `/view`)
 
-3. Create direct download URL:
+3. Create direct download URL (with `confirm=t` to bypass virus scan):
    ```
-   https://drive.google.com/uc?export=download&id=FILE_ID
+   https://drive.google.com/uc?export=download&confirm=t&id=FILE_ID
    ```
+   
+   **Important:** The `confirm=t` parameter is required for zip files and other files that trigger Google Drive's virus scan warning.
 
 ### Step 3: Set in Netlify Environment Variable
 
@@ -71,7 +73,8 @@ Use any file hosting service:
 2. **Right-click** → **Get link** → **Change to "Anyone with the link"**
 3. **Copy link** (e.g., `https://drive.google.com/file/d/1ABC123xyz456/view?usp=sharing`)
 4. **Extract ID**: `1ABC123xyz456`
-5. **Create URL**: `https://drive.google.com/uc?export=download&id=1ABC123xyz456`
+5. **Create URL**: `https://drive.google.com/uc?export=download&confirm=t&id=1ABC123xyz456`
+   (The `confirm=t` parameter is important for large files)
 6. **Set in Netlify**: `VITE_EXTENSION_DOWNLOAD_URL` = the URL from step 5
 7. **Redeploy** Netlify site
 
